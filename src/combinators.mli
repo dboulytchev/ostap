@@ -136,7 +136,7 @@ class memoStream :
     method look :
       string -> ('a, Matcher.Token.t, Reason.t) Types.result
     method memoize :
-      ('a, 'p, 'e) Types.parse -> ('a, 'p, 'e) Types.result
+      (('a, ('p * 'a, 'e) Types.tag as 'p, 'e) Types.parse -> ('a, 'p, 'e) Types.parse) -> ('a, 'p, 'e) Types.result
     method pos : int
     method prefix : int -> string
     method regexp :
@@ -149,12 +149,12 @@ class memoStream :
 (** Wrap left recursive calls in your parser definition in [memo] function to be able to process them.
 *)
 val memo :
-  (#memoStream as 'a, 'b, 'c) Types.parse ->
+  ((#memoStream as 'a, ('b * 'a, 'c) Types.tag as 'b, 'c) Types.parse -> ('a, 'b, 'c) Types.parse) ->
   'a -> ('a, 'b, 'c) Types.result
   
 (** Fix point combinator to support left recursion in the parser implementation.
 *)  
-val fix :
+(*val fix :
   ((#memoStream as 'a, 'b, 'c) Types.parse ->
    'a -> ('a, 'b, 'c) Types.result) ->
-  'a -> ('a, 'b, 'c) Types.result
+  'a -> ('a, 'b, 'c) Types.result*)
