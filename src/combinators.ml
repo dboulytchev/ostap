@@ -123,45 +123,41 @@ class memoStream s =
 
     method memoize : 'p 'e . (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse) -> ('self, 'p, 'e) result = 
       fun p -> 
-        let getParsedValue  : 
+        let getParsedValue (* : 
               'p 'e. ((int * int) * int) list 
                   -> (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse)
                   -> int 
-                  -> (('self, 'p, 'e) parse) =
+                  -> (('self, 'p, 'e) result) *) =
          fun t p pos ->
           let equal (f0, p0) (f1, p1) = f0 == f1 && p0 = p1 in
           let find key tab = snd (List.find (fun (k,_) -> equal key k) tab) in 
           Obj.magic (find (Obj.magic p, pos) t)
         in
-        let replaceValue : 
+        let replaceValue (*: 
               'p 'e. ((int * int) * int) list 
                   -> (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse)
                   -> int 
-                  -> (('self, 'p, 'e) parse) 
-                  -> (((int * int) * int) list) = 
+                  -> (('self, 'p, 'e) result)
+                  -> (((int * int) * int) list) *)= 
          fun t p pos v -> ((Obj.magic p, pos), (Obj.magic v)) :: t 
         in
         let rec increaseBound t p pos =
           let prev = getParsedValue t p this#pos in
-          match (p prev) {< table = t >} with
-          | Failed _ -> getParsedValue t p this#pos
+          match (p (fun _ -> prev)) {< table = t >} with
+          | Failed _ -> prev
           | Parsed ((_, s), _) as parsed -> 
             if s#pos > pos 
-            then increaseBound (replaceValue t p this#pos (fun _ -> parsed)) p s#pos
-            else getParsedValue t p this#pos 
+            then increaseBound (replaceValue t p this#pos parsed) p s#pos
+            else getParsedValue t p this#pos
         in
-        try 
-          (getParsedValue table p this#pos) this
-        with  
-          Not_found -> 
-            let bot = fun _ -> Failed None in
-            let newStream = {< table = replaceValue table p this#pos bot >} in
-            match (p bot) newStream  with
+        try
+          getParsedValue table p this#pos
+        with
+          Not_found ->
+            match (p (fun _ -> Failed None)) {< table = replaceValue table p this#pos (Failed None) >} with
             | Failed _ as r -> r
-            | Parsed _ as r ->
-              let prev = (fun _ -> r) in
-              let newStream = replaceValue table p this#pos prev in              
-              (increaseBound newStream p this#pos) this
+            | Parsed ((b, s'), e) as r ->
+              increaseBound (replaceValue table p this#pos r) p this#pos
   end
   
 let memo = 
