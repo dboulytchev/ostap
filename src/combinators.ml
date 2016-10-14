@@ -121,44 +121,47 @@ class memoStream s =
     
     val table : ((int * int) * int) list = []
 
-    method memoize : 'e . (('self, ('p * 'self, 'e) Types.tag as 'p, 'e) parse -> ('self, 'p, 'e) parse) -> ('self, 'p, 'e) result = 
+    method memoize : 'p 'e . (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse) -> ('self, 'p, 'e) result = 
       fun p -> 
-        let getParsedValue : 'e. ((int * int) * int) list -> (('self, ('p * 'self, 'e) Types.tag as 'p, 'e) parse -> ('self, 'p, 'e) parse) -> int -> (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse)  =
+        let getParsedValue  : 
+              'p 'e. ((int * int) * int) list 
+                  -> (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse)
+                  -> int 
+                  -> (('self, 'p, 'e) parse) =
          fun t p pos ->
           let equal (f0, p0) (f1, p1) = f0 == f1 && p0 = p1 in
-          let rec find key tab = snd (List.find (fun (k,_) -> equal key k) tab)
-            (*match tab with 
-            | [] -> raise Not_found
-            | (k, v) :: t -> if equal key k 
-                             then v
-                             else find key t *)
-          in Obj.magic (find (Obj.magic p, pos) t)
+          let find key tab = snd (List.find (fun (k,_) -> equal key k) tab) in 
+          Obj.magic (find (Obj.magic p, pos) t)
         in
-        let replaceValue : 'e. ((int * int) * int) list -> (('self, ('p * 'self, 'e) Types.tag as 'p, 'e) parse -> ('self, 'p, 'e) parse) -> int -> (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse) -> (((int * int) * int) list) = 
-         fun t p pos v ->
-          ((Obj.magic p, pos), (Obj.magic v)) :: t 
+        let replaceValue : 
+              'p 'e. ((int * int) * int) list 
+                  -> (('self, 'p, 'e) parse -> ('self, 'p, 'e) parse)
+                  -> int 
+                  -> (('self, 'p, 'e) parse) 
+                  -> (((int * int) * int) list) = 
+         fun t p pos v -> ((Obj.magic p, pos), (Obj.magic v)) :: t 
         in
         let rec increaseBound t p pos =
           let prev = getParsedValue t p this#pos in
-          match (p (prev (fun _ -> Failed None))) {< table = t >} with
+          match (p prev) {< table = t >} with
           | Failed _ -> getParsedValue t p this#pos
           | Parsed ((_, s), _) as parsed -> 
             if s#pos > pos 
-            then increaseBound (replaceValue t p this#pos (fun _ -> return parsed)) p s#pos
+            then increaseBound (replaceValue t p this#pos (fun _ -> parsed)) p s#pos
             else getParsedValue t p this#pos 
         in
         try 
-          ((getParsedValue table p this#pos) (fun _ -> Failed None)) this
+          (getParsedValue table p this#pos) this
         with  
           Not_found -> 
-            let fail = fun _ -> fail None in
-            let newStream = {< table = replaceValue table p this#pos fail >} in
-            match (p (fail (fun _ -> Failed None))) newStream  with
+            let bot = fun _ -> Failed None in
+            let newStream = {< table = replaceValue table p this#pos bot >} in
+            match (p bot) newStream  with
             | Failed _ as r -> r
             | Parsed _ as r ->
-              let prev = fun _ -> return r in
+              let prev = (fun _ -> r) in
               let newStream = replaceValue table p this#pos prev in              
-              ((increaseBound newStream p this#pos) (fun _ -> Failed None)) this
+              (increaseBound newStream p this#pos) this
   end
   
 let memo = 

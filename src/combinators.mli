@@ -136,7 +136,7 @@ class memoStream :
     method look :
       string -> ('a, Matcher.Token.t, Reason.t) Types.result
     method memoize :
-      (('a, ('p * 'a, 'e) Types.tag as 'p, 'e) Types.parse -> ('a, 'p, 'e) Types.parse) -> ('a, 'p, 'e) Types.result
+      (('a, 'p, 'e) Types.parse -> ('a, 'p, 'e) Types.parse) -> ('a, 'p, 'e) Types.result
     method pos : int
     method prefix : int -> string
     method regexp :
