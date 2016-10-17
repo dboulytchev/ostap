@@ -59,11 +59,11 @@ let (<|>) = alt
 
 let seq x y s =
   match x s with
-  | Parsed ((b, s'), err) ->	
+  | Parsed ((b, s'), err) ->
       (match y b s' with 
       | Failed  x     -> Failed (join err x) 
       | Parsed (s, e) -> Parsed (s, join err e)
-      )	
+      )
   | x -> cast x
     
 let (|>) = seq
@@ -138,14 +138,14 @@ class memoStream s =
         in
         let rec increaseBound t p pos =
           match p {< table = t >} with
-          | Failed _ -> getParsedValue t p this#pos            
+          | Failed _ -> getParsedValue t p this#pos
           | Parsed ((_, s), _) as parsed -> 
             if s#pos > pos 
             then increaseBound (replaceValue t p this#pos parsed) p s#pos
             else getParsedValue t p this#pos
         in
         try 
-          getParsedValue table p this#pos           
+          getParsedValue table p this#pos
         with  
           Not_found -> 
             match p {< table = replaceValue table p this#pos (Failed None) >} with
@@ -160,10 +160,18 @@ let memo =
 let fix p s = 
   let x' = ref None in  
   let rec fix p s = p (fix p) s in
+  let help p prev = 
+    match p with 
+    | Failed _ -> prev
+    | Parsed ((_,s),_) -> 
+      match prev with 
+      | Parsed ((_,prevS),_) -> if s#pos < prevS#pos then prev else p
+      | _ -> p
+  in
   let p x s = 
     match !x' with
-    | None   -> x' := Some (fun s -> memo x s); p x s 
-    | Some x -> p x s 
+    | None   -> x' := Some (fun s -> memo x s); help (p x s) (x s)
+    | Some x -> help (p x s) (x s)
   in
   fix p s
 
