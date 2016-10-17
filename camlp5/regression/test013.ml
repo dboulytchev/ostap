@@ -40,3 +40,4 @@ let _ =
   match main (new lexer "1+2+3") with
   | Parsed ((b, _), _) -> Printf.printf "Parsed: %s\n" (print b)
   | Failed m -> Printf.printf "Not parsed:\n%s\n" (Reason.toString `All `Acc m)
+
