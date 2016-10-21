@@ -209,7 +209,7 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 
 # type in sources here
-SOURCES = $(top_srcdir)/src/bNF3.ml extension.ml
+SOURCES = $(top_srcdir)/src/BNF3.ml extension.ml
 SUBDIRS = regression 
 
 # define macros that creates directiries

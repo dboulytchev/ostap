@@ -1,5 +1,5 @@
 # type in sources here
-SOURCES = $(top_srcdir)/src/bNF3.ml extension.ml
+SOURCES = $(top_srcdir)/src/BNF3.ml extension.ml
 SUBDIRS = regression 
 
 include $(top_srcdir)/m4/Makefile.am.vars

@@ -15,7 +15,7 @@
  * (enclosed in the file COPYING).
  *)
 
-open Str
+open Re_str
 open Ostap
 open Types
 

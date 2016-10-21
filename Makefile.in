@@ -60,7 +60,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = src regression camlp5 util
+DIST_SUBDIRS = src camlp5 util
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -211,9 +211,7 @@ target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
-
-#SUBDIRS = src regression $(P4_SUBDIR) $(P5_SUBDIR) util
-SUBDIRS = src regression $(P5_SUBDIR) util
+SUBDIRS = src $(P5_SUBDIR) util
 @CAMLP4_TRUE@P4_SUBDIR = camlp4
 @CAMLP5_TRUE@P5_SUBDIR = camlp5
 all: all-recursive

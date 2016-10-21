@@ -1,3 +1,0 @@
-Matching "identDigits" against "1 and the rest"; should not remove "1" from stream
-  stream: 1 and the ...;
-  args  : ID=[], NEXT=[]

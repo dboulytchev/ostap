@@ -6,7 +6,7 @@ open Printf
 
 class lexer s =
   let skip  = Skip.create [Skip.whitespaces " \n\t\r"] in
-  let const = Str.regexp "[0-9]+" in
+  let const = Re_str.regexp "[0-9]+" in
   object (self)
 
     inherit Combinators.memoStream s

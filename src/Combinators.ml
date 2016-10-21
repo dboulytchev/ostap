@@ -21,12 +21,12 @@ open List
 open Types
 
 let join = function
-  | None   -> fun y -> y
-  | Some x -> function None -> Some x | Some y -> Some (x#add y)
+| None   -> fun y -> y
+| Some x -> function None -> Some x | Some y -> Some (x#add y)
 
 let comment str = function
-  | None   -> None
-  | Some m -> Some (m#comment str)
+| None   -> None
+| Some m -> Some (m#comment str)
 
 let return x = (fun s -> Parsed ((x, s), None))
 let cast     = function Failed x -> Failed x | _ -> invalid_arg "Ostap.cast"

@@ -1,7 +1,0 @@
-Matching "identId" against "abc and the rest"; should not match
-Matching "identId" against "abc abc and the rest"; should match "abc abc"
-  stream:  and the r...;
-  args  : ID=[abc], NEXT=[ ]
-Matching "identBeforeId" against "abc abc and the rest"; should match "abc "
-  stream: abc and th...;
-  args  : ID=[abc], NEXT=[ ]

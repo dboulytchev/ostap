@@ -1,0 +1,15 @@
+true: rectypes, package(re.str)
+"camlp5/extension.ml": package(camlp5), pp(camlp5o), use_ostap_lib
+
+# GT for View module
+<src/*>: package(GT)
+<src/*.ml>: for-pack(Ostap)
+<src/regexp.ml>: use_pa_log, package(logger.syntax)
+
+<util/Util.ml>:  use_pa_ostap, package(camlp5), for-pack(Ostap)
+<util/Util.mli>: for-pack(Ostap)
+
+#<util/*>: syntax(camlp5o), package(camlp5), ppopt(pr_o.cmo)
+
+<camlp5/regression/*.ml>: use_pa_ostap
+<camlp5/regression/test*.byte> or <camlp5/regression/test*.native>: package(re.str,GT)

@@ -1,0 +1,27 @@
+opam-version: "1.2"
+authors: "dboulytchev@gmail.com"
+maintainer: "kakadu.hafanana@gmail.com"
+version:  "0.3"
+homepage: "http://oops.math.spbu.ru/projects/ostap"
+bug-reports: "https://github.com/Ostapers/ostap/issues"
+dev-repo:    "git+https://github.com/Ostapers/ostap.git"
+
+build: [
+  [make "-f" "Makefile.ob" ]
+]
+
+install: [make "-f" "Makefile.ob" "PREFIX=%{prefix}%" "install"]
+remove:  ["ocamlfind" "remove" "ostap"]
+flags: [ light-uninstall ]
+
+build-test: [
+  [make "-f" "Makefile.ob" "test"]
+]
+
+depends: [
+  "ocamlbuild" {build}
+  "ocamlfind"
+  "camlp5"
+  "GT"
+  "re"
+]

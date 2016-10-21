@@ -1,7 +1,7 @@
 
 # type in sources here
-SOURCES = pretty.ml prioReorderer.ml bNF3.ml types.ml matcher.ml combinators.ml msg.ml reason.ml ostream.ml aSCII.ml regexp.ml deterministic.ml trap.ml
-MLI = pretty.mli prioReorderer.mli bNF3.mli types.mli matcher.mli combinators.mli msg.mli reason.mli ostream.mli aSCII.mli regexp.mli deterministic.mli trap.mli
+SOURCES = Pretty.ml PrioReorderer.ml BNF3.ml Types.ml Matcher.ml Combinators.ml Msg.ml Reason.ml Trap.ml
+MLI = Pretty.mli PrioReorderer.mli BNF3.mli Types.mli Matcher.mli Combinators.mli Msg.mli Reason.mli Trap.mli
 
 include $(top_srcdir)/m4/Makefile.am.vars
 
@@ -9,7 +9,7 @@ include $(top_srcdir)/m4/Makefile.am.vars
 CMO := $(SORTED:.ml=.cmo)
 
 # OCaml parser call with flags
-AM_P5FLAGS := -pp "$(CAMLP5O) $(PARSER_INCLUDES) pr_o.cmo pa_checked.cmo pa_log.cmo $(LOG)"
+AM_P5FLAGS := -pp "$(CAMLP5O) $(PARSER_INCLUDES) pr_o.cmo pa_log.cmo $(LOG) pa_gt.cmo -L `camlp5o -where`"
 AM_BFLAGS += -w x -rectypes -for-pack Ostap
 AM_OFLAGS += -w x -rectypes -for-pack Ostap
 

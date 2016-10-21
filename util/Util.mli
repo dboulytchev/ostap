@@ -20,6 +20,16 @@ open Combinators
 
 (** Predefined parsing utilities. *)
 
+(** {2 Parsing keywords} *)
+
+(** [keyword[string]] parses a string as a keyword (e.g. taking into
+    account word boundaries
+*)
+val keyword : string -> < regexp : string -> string -> 'a; .. > -> 'a
+
+(** Infix synonym for [keyword] *)
+val ( ~$ ) : string -> < regexp : string -> string -> 'a; .. > -> 'a
+
 (** {2 List parsing} *)
 
 (** [listByWith s delim item f x] parses a non-empty list of [item]s delimited by [delim] from a stream [s]
@@ -79,7 +89,7 @@ val list0 : ('a, 'd, 'c) parse ->
             (< look : string -> ('a, 'b, < add : 'c -> 'c; .. > as 'c) Types.result; .. > as 'a) ->
             ('a, 'd list, 'c) result
 
-(** [id x] is just the parser x *)
+(** Identity parser *)
 val id : ('a, 'b, 'c) parse -> ('a, 'b, 'c) parse
 
 (** {2 Expression parsing} *)
@@ -120,7 +130,71 @@ val id : ('a, 'b, 'c) parse -> ('a, 'b, 'c) parse
      ('a, 'b, 'c) parse ->
      ('a, 'b, 'c) parse
 
+(** {2 Lexing components} *)
+
+module Lexers :
+  sig
+
+    (** A lexer component for parsing identifiers, started with an uppercase letter;
+        the first argument is a list of keywords, the second --- a string to parse
+     *)
+    class virtual uident : string list -> string ->
+      object('a)
+        method virtual get : string -> Re_str.regexp -> ('a, Matcher.Token.t, Reason.t) Types.result
+        method getUIDENT : ('a, string, Reason.t) Types.result
+      end
+
+    (** A lexer component for parsing identifiers, started with a lowercase letter;
+        the first argument is a list of keywords, the second --- a string to parse
+     *)
+    class virtual lident : string list -> string ->
+      object('a)
+	method virtual get : string -> Re_str.regexp -> ('a, Matcher.Token.t, Reason.t) Types.result
+        method getLIDENT : ('a, string, Reason.t) Types.result
+      end
+
+    (** A lexer component for parsing regular identifiers;
+        the first argument is a list of keywords, the second --- a string to parse
+     *)
+    class virtual ident : string list -> string ->
+      object('a)
+        method virtual get : string -> Re_str.regexp -> ('a, Matcher.Token.t, Reason.t) Types.result
+        method getIDENT : ('a, string, Reason.t) Types.result
+      end
+
+    (** A lexer component for parsing signed decimal constants; the first argument is 
+        a string to parse
+     *)
+    class virtual decimal : string ->
+      object('a)
+	method virtual get : string -> Re_str.regexp -> ('a, Matcher.Token.t, Reason.t) Types.result	
+        method getDECIMAL : ('a, int, Reason.t) Types.result
+      end
+
+    (** A lexer component for parsing quoted strings; the first argument is 
+        a string to parse
+     *)
+    class virtual string : String.t ->
+      object('a)
+	method virtual get : String.t -> Re_str.regexp -> ('a, Matcher.Token.t, Reason.t) Types.result	
+        method getSTRING : ('a, String.t, Reason.t) Types.result
+      end
+
+    (** A lexer component for skipping whitespaces and comments; the first argument is
+        a list of skipped items specifiers (see Matcher.mli), the second --- a string 
+        to parse
+     *)
+    class skip : Matcher.Skip.t list -> String.t ->
+      object ('a) inherit Matcher.t end
+
+  end
+
 (** {2 Miscellaneous} *)
 
 (** [read fname] returns the content of the file [fname]. *)
 val read : string -> string
+
+(** [parse l p] parses a stream, represented by [l], by a parser [p]; this is a 
+    simplified entry point 
+*)
+val parse : (#Matcher.t as 'a) -> ('a, 'c, Reason.t) parse -> [`Fail of String.t | `Ok of 'c]

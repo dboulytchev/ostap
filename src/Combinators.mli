@@ -1,7 +1,7 @@
 (*
- * Ostap: a common set of parser combinators.
- * Copyright (C) 2006
- * Dmitri Boulytchev, St.Petersburg State University
+ * Combinators: monadic parser combinators.
+ * Copyright (C) 2006-2016
+ * Dmitri Boulytchev, Ekaterina Verbitskaja, St.Petersburg State University
  * 
  * This software is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -17,7 +17,7 @@
  
 open Types 
 
-(** Ostap --- a general set of parser combinators. *)
+(** Ostap --- monadic parser combinators library. *)
 
 (** The name of this library originates from {{:http://en.wikipedia.org/wiki/Ostap_Bender} Ostap Bender}
     --- the central character of Ilya Ilf and Eugene Petrov comedy "The Twelve Chairs". Bender is
@@ -119,7 +119,8 @@ val altl : ('a, 'b, <add: 'c -> 'c; ..>  as 'c) parse list -> ('a, 'b, 'c) parse
  *)
 val unwrap : ('stream, 'parsed, 'error) result -> ('parsed -> 'a) -> ('error option -> 'a) -> 'a
 
-(** Inherit this stream implementation to be able to use left recursion in parser definitions. Left recursion support is based on {{:http://link.springer.com/chapter/10.1007%2F978-3-642-33182-4_4} this paper}: 
+(** Inherit this stream implementation to be able to use left recursion in parser definitions. 
+    Left recursion support is based on {{:http://link.springer.com/chapter/10.1007%2F978-3-642-33182-4_4} this paper}: 
 *)
 class memoStream :
   string ->
@@ -129,7 +130,7 @@ class memoStream :
     method coord : Msg.Coord.t
     method get :
       string ->
-      Str.regexp -> ('a, Matcher.Token.t, Reason.t) Types.result
+      Re_str.regexp -> ('a, Matcher.Token.t, Reason.t) Types.result
     method getEOF : ('a, Matcher.Token.t, Reason.t) Types.result
     method line : int
     method loc : Msg.Locator.t
@@ -146,7 +147,7 @@ class memoStream :
       Msg.Coord.t -> [ `Failed of Msg.t | `Skipped of int * Msg.Coord.t ]
   end
 
-(** Wrap left recursive calls in your parser definition in [memo] function to be able to process them.
+(** Wrap left-recursive calls in your parser definition in [memo] function to be able to process them.
 *)
 val memo :
   (#memoStream as 'a, 'b, 'c) Types.parse ->

@@ -1020,7 +1020,7 @@ EOF
 dnl Try to link with library
 		unset CMA
 		if test -f "$META"; then
-		    CMA=`grep "archive(byte)" $META | sed -e 's,[[^=]]*= *"\(.*\)",\1,g'`
+		    CMA=`grep "archive(byte)" $META | sed -e 's,[[^=]]*= *"\(.*\)",\1,g' | sed -e ':a;N;$!ba;s/\n/ /g'`
 		fi
 		test -z "$CMA" && CMA="$1.cma"
 		if ! $OCAMLC -o conftest -rectypes $MODULE_INCLUDES $CMA conftest.cmo > /dev/null 2>&1 ; then
@@ -1239,29 +1239,23 @@ m4trace:configure.in:54: -1- AC_CHECK_CAMLP5_MODULE([q_MLast], [q_MLast.cmo], [+
 m4trace:configure.in:54: -1- m4_pattern_allow([^PARSER_INCLUDES$])
 m4trace:configure.in:55: -1- AC_CHECK_CAMLP5_MODULE([Pr_o], [pr_o.cmo], [+camlp5])
 m4trace:configure.in:55: -1- m4_pattern_allow([^PARSER_INCLUDES$])
-m4trace:configure.in:56: -1- AC_CHECK_CAMLP5_MODULE([logger], [pa_log.cmo], [+camlp5 ../logger/camlp5], [http://oops.tepkom.ru/projects/logger])
+m4trace:configure.in:56: -1- AC_CHECK_CAMLP5_MODULE([logger], [pa_log.cmo], [+camlp5])
 m4trace:configure.in:56: -1- m4_pattern_allow([^PARSER_INCLUDES$])
-m4trace:configure.in:57: -1- AC_CHECK_CAMLP5_MODULE([checked], [pa_checked.cmo], [+camlp5 ../checked/camlp5], [http://oops.tepkom.ru/projects/checked])
+m4trace:configure.in:57: -1- AC_CHECK_CAMLP5_MODULE([GT], [pa_gt.cmo], [+camlp5])
 m4trace:configure.in:57: -1- m4_pattern_allow([^PARSER_INCLUDES$])
-m4trace:configure.in:58: -1- AC_CHECK_CAMLP5_MODULE([GT], [pa_gt.cmo], [+camlp5 ../ostap/camlp5], [http://oops.math.spbu.ru/projects/ostap])
 m4trace:configure.in:58: -1- m4_pattern_allow([^PARSER_INCLUDES$])
-m4trace:configure.in:59: -1- m4_pattern_allow([^PARSER_INCLUDES$])
-m4trace:configure.in:66: -1- AC_CHECK_OCAML_LIBRARY([typeutil], [Compare], [../typeutil/src], [http://oops.tepkom.ru/projects/typeutil])
+m4trace:configure.in:65: -1- AC_CHECK_OCAML_LIBRARY([GT], [GT])
+m4trace:configure.in:65: -1- m4_pattern_allow([^MODULE_INCLUDES$])
+m4trace:configure.in:65: -1- m4_pattern_allow([^EXTRA_CMA$])
+m4trace:configure.in:65: -1- m4_pattern_allow([^META$])
+m4trace:configure.in:66: -1- AC_CHECK_OCAML_LIBRARY([re], [Re_str])
 m4trace:configure.in:66: -1- m4_pattern_allow([^MODULE_INCLUDES$])
 m4trace:configure.in:66: -1- m4_pattern_allow([^EXTRA_CMA$])
 m4trace:configure.in:66: -1- m4_pattern_allow([^META$])
-m4trace:configure.in:67: -1- AC_CHECK_OCAML_LIBRARY([GT], [GT], [../generic-transformers/src], [http://oops.math.spbu.ru/projects/checked])
 m4trace:configure.in:67: -1- m4_pattern_allow([^MODULE_INCLUDES$])
-m4trace:configure.in:67: -1- m4_pattern_allow([^EXTRA_CMA$])
-m4trace:configure.in:67: -1- m4_pattern_allow([^META$])
-m4trace:configure.in:69: -1- AC_CHECK_OCAML_LIBRARY([str], [Str])
-m4trace:configure.in:69: -1- m4_pattern_allow([^MODULE_INCLUDES$])
-m4trace:configure.in:69: -1- m4_pattern_allow([^EXTRA_CMA$])
-m4trace:configure.in:69: -1- m4_pattern_allow([^META$])
-m4trace:configure.in:70: -1- m4_pattern_allow([^MODULE_INCLUDES$])
-m4trace:configure.in:71: -1- m4_pattern_allow([^EXTRA_CMA$])
-m4trace:configure.in:77: -1- m4_pattern_allow([^LOG$])
-m4trace:configure.in:78: -1- m4_pattern_allow([^DEBUG$])
-m4trace:configure.in:80: -1- m4_pattern_allow([^ac_aux_dir$])
-m4trace:configure.in:94: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.in:94: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.in:68: -1- m4_pattern_allow([^EXTRA_CMA$])
+m4trace:configure.in:74: -1- m4_pattern_allow([^LOG$])
+m4trace:configure.in:75: -1- m4_pattern_allow([^DEBUG$])
+m4trace:configure.in:77: -1- m4_pattern_allow([^ac_aux_dir$])
+m4trace:configure.in:90: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.in:90: -1- m4_pattern_allow([^LTLIBOBJS$])

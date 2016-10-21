@@ -199,8 +199,8 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 
 # type in sources here
-SOURCES = pretty.ml prioReorderer.ml bNF3.ml types.ml matcher.ml combinators.ml msg.ml reason.ml ostream.ml aSCII.ml regexp.ml deterministic.ml trap.ml
-MLI = pretty.mli prioReorderer.mli bNF3.mli types.mli matcher.mli combinators.mli msg.mli reason.mli ostream.mli aSCII.mli regexp.mli deterministic.mli trap.mli
+SOURCES = Pretty.ml PrioReorderer.ml BNF3.ml Types.ml Matcher.ml Combinators.ml Msg.ml Reason.ml Trap.ml
+MLI = Pretty.mli PrioReorderer.mli BNF3.mli Types.mli Matcher.mli Combinators.mli Msg.mli Reason.mli Trap.mli
 
 # define macros that creates directiries
 mkinstalldirs = $(INSTALL_SCRIPT) -d
@@ -255,7 +255,7 @@ TARGET = $(MLI) $(CMI) $(CMO)
 AM_P4FLAGS = -pp "$(CAMLP4OF) $(PARSER_INCLUDES)"
 
 # OCaml parser call with flags
-AM_P5FLAGS := -pp "$(CAMLP5O) $(PARSER_INCLUDES) pr_o.cmo pa_checked.cmo pa_log.cmo $(LOG)"
+AM_P5FLAGS := -pp "$(CAMLP5O) $(PARSER_INCLUDES) pr_o.cmo pa_log.cmo $(LOG) pa_gt.cmo -L `camlp5o -where`"
 
 # OCaml documentator called with flags
 AM_DOCFLAGS = -html

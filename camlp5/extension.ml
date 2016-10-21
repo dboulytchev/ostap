@@ -557,6 +557,20 @@ EXTEND
   ];
 
   o_prefix: [
+    [ "%"; s=STRING -> 
+      let name   = <:expr< $str:s$ >> in
+      let regexp = <:expr< $name$ ^ "\\\\\\\\b" >> in
+      let look   = <:expr< _ostap_stream # regexp ($name$) ($regexp$) >> in
+      let pwel = [
+	(
+	 <:patt<$lid:"_ostap_stream"$>>, 
+	 Ploc.VaVal None, 
+	 look 
+	)
+      ] in
+      let (e, s) = (<:expr<fun [$list:pwel$]>>, Some (Expr.string (!printExpr name))) in
+      ((None, true, None, e), s)
+    ] |
     [ m=OPT "-"; (p, s)=o_basic -> 
        let (binding, parse, f) = p in
        ((f, (m <> None), binding, parse), s)

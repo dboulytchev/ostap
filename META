@@ -1,0 +1,16 @@
+version = "0.3"
+description = "Parser-combinator library"
+requires = "re.str GT"
+archive(byte) = "ostap.cmo"
+archive(byte, plugin) = "ostap.cmo"
+archive(native) = "ostap.cmx"
+exists_if = "ostap.cmo"
+
+package "syntax" (
+ version = "0.3"
+ description = "Camlp5 syntax extension"
+ requires = "camlp5 "
+ archive(syntax, preprocessor) = "pa_ostap.cmo"
+ archive(syntax, toploop) = "pa_ostap.cmo"
+)
+

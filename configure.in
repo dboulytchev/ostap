@@ -53,9 +53,8 @@ AC_CHECK_CAMLP5_MODULE(pa_extend, pa_extend.cmo, +camlp5)
 AC_CHECK_CAMLP5_MODULE(pa_pprintf, pa_pprintf.cmo, +camlp5)
 AC_CHECK_CAMLP5_MODULE(q_MLast, q_MLast.cmo, +camlp5)
 AC_CHECK_CAMLP5_MODULE(Pr_o, pr_o.cmo, +camlp5)
-AC_CHECK_CAMLP5_MODULE(logger, pa_log.cmo, +camlp5 ../logger/camlp5, http://oops.tepkom.ru/projects/logger) dnl GET: svn co svn://oops.tepkom.ru/svn/logger/trunk
-AC_CHECK_CAMLP5_MODULE(checked, pa_checked.cmo, +camlp5 ../checked/camlp5, http://oops.tepkom.ru/projects/checked) dnl GET: svn co svn://oops.tepkom.ru/svn/checked/trunk
-AC_CHECK_CAMLP5_MODULE(GT, pa_gt.cmo, +camlp5 ../ostap/camlp5, http://oops.math.spbu.ru/projects/ostap)
+AC_CHECK_CAMLP5_MODULE(logger, pa_log.cmo, +camlp5)
+AC_CHECK_CAMLP5_MODULE(GT, pa_gt.cmo, +camlp5)
 AC_SUBST(PARSER_INCLUDES)
 fi
 
@@ -63,10 +62,8 @@ dnl check for compiler module
 dnl usage:
 dnl library name, modules to open,
 dnl 1st dir <space> 2nd dir <space> etc., library homepage.
-AC_CHECK_OCAML_LIBRARY(typeutil, Compare, ../typeutil/src, http://oops.tepkom.ru/projects/typeutil) dnl GET: svn co svn://oops.tepkom.ru/svn/typeutil/trunk
-AC_CHECK_OCAML_LIBRARY(GT, GT, ../generic-transformers/src, http://oops.math.spbu.ru/projects/checked) dnl GET: svn co http://oops.math.spbu.ru/svn/chec
-dnl more module checks
-AC_CHECK_OCAML_LIBRARY(str, Str)
+AC_CHECK_OCAML_LIBRARY(GT, GT)
+AC_CHECK_OCAML_LIBRARY(re, Re_str)
 AC_SUBST(MODULE_INCLUDES)
 AC_SUBST(EXTRA_CMA)
 
@@ -88,7 +85,6 @@ camlp4/regression/Makefile
 camlp5/Makefile
 camlp5/regression/Makefile
 util/Makefile
-regression/Makefile
 sample/Makefile
 ])
 AC_OUTPUT

@@ -42,8 +42,8 @@ ostap (
 
 class lexer s =
   let skip  = Skip.create [Skip.whitespaces " \n\t\r"] in
-  let ident = Str.regexp "[a-zA-Z][a-zA-Z0-9]*" in
-  let const = Str.regexp "[0-9]+" in
+  let ident = Re_str.regexp "[a-zA-Z][a-zA-Z0-9]*" in
+  let const = Re_str.regexp "[0-9]+" in
   object (self)
 
     inherit Matcher.t s

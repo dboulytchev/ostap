@@ -109,10 +109,8 @@ module rec Locator :
             (match fil with None -> "" | Some fil -> sprintf "%s: " fil) ^ coord
          | Interval (x, y) ->
             let succ, filx, x =
-               (*printf "Looking for %s\n" (Coord.toString x);*)
                !writer !relocs x in
             let    _, fily, y =
-               (*printf "Looking for %s\n" (Coord.toString y);*)
                !writer succ    y in
             (match filx, fily with
             | None, None -> sprintf "%s-%s" x y
@@ -212,16 +210,16 @@ and FileLoc :
          succ, Some fil, reloc
 
       let stripLines s =
-         let r = Str.regexp "\r?\n#line \"\([^\"]*\)\" (\([0-9]+\):\([0-9]+\))\r?\n" in
-         let makeInt i s = int_of_string (Str.matched_group i s) in
+         let r = Re_str.regexp "\r?\n#line \"\([^\"]*\)\" (\([0-9]+\):\([0-9]+\))\r?\n" in
+         let makeInt i s = int_of_string (Re_str.matched_group i s) in
          let rec inner pos loc m s acc =
             try
                if !debug then printf "loc was: %s\n" (Coord.toString loc);
-               let first = Str.search_forward r s 0 in
-               let reloc = (Str.matched_group 1 s, (makeInt 2 s, makeInt 3 s)) in
+               let first = Re_str.search_forward r s 0 in
+               let reloc = (Re_str.matched_group 1 s, (makeInt 2 s, makeInt 3 s)) in
                let loc = if first > 0 then Coord.shift loc s 0 first else loc in
                let current = try MC.find loc m with Not_found -> [] in
-               let last = Str.match_end () in
+               let last = Re_str.match_end () in
                let newpos = pos + first in
                if !debug then begin
                   printf "loc is: %s\n" (Coord.toString loc);
@@ -229,7 +227,7 @@ and FileLoc :
                   for i = 0 to min 20 (String.length s - 1) do printf "%c" s.[i] done;
                   printf "'\n";
                end;
-               inner newpos loc (MC.add loc ((newpos, reloc)::current) m) (Str.string_after s last) (acc ^ (Str.string_before s first))
+               inner newpos loc (MC.add loc ((newpos, reloc)::current) m) (Re_str.string_after s last) (acc ^ (Re_str.string_before s first))
             with Not_found -> m, acc ^ s
          in inner 0 (1, 1) MC.empty s ""
 
@@ -255,12 +253,12 @@ let phrase    phrase          = make phrase [||] Locator.No
 let orphan    phrase args     = make phrase args Locator.No
 
 let string t = 
-  let parmExpr = Str.regexp "%\\([0-9]+\\)" in
-  Str.global_substitute 
+  let parmExpr = Re_str.regexp "%\\([0-9]+\\)" in
+  Re_str.global_substitute 
     parmExpr  
     (fun s -> 
       try 
-        t.args.(int_of_string (Str.replace_matched "\\1" s))
+        t.args.(int_of_string (Re_str.replace_matched "\\1" s))
       with
       | Failure "int_of_string" -> 
           raise (Failure 

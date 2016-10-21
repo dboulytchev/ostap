@@ -543,7 +543,7 @@ EOF
 dnl Try to link with library
 		unset CMA
 		if test -f "$META"; then
-		    CMA=`grep "archive(byte)" $META | sed -e 's,[[^=]]*= *"\(.*\)",\1,g'`
+		    CMA=`grep "archive(byte)" $META | sed -e 's,[[^=]]*= *"\(.*\)",\1,g' | sed -e ':a;N;$!ba;s/\n/ /g'`
 		fi
 		test -z "$CMA" && CMA="$1.cma"
 		if ! $OCAMLC -o conftest -rectypes $MODULE_INCLUDES $CMA conftest.cmo > /dev/null 2>&1 ; then

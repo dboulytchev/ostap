@@ -18,7 +18,7 @@
 open Types
 open String
 open Printf
-open Str
+open Re_str
 open Reason
 	
 module Token =
@@ -28,7 +28,7 @@ module Token =
 
     let toString (t, c) = sprintf "%s at %s" t (Msg.Coord.toString c)
 
-    let loc (t, c) = Msg.Locator.Interval (c, Msg.Coord.shift c t 0 (length t)) (* ((fst c), (snd c)+(length t)-1) *)
+    let loc (t, c) = Msg.Locator.Interval (c, Msg.Coord.shift c t 0 (length t))
     let repr       = fst
 
   end
@@ -193,7 +193,7 @@ class t s =
 
     method regexp name str = self#get name 
       (try Hashtbl.find regexps str with Not_found ->
-         let regexp = Str.regexp str in
+         let regexp = Re_str.regexp str in
          Hashtbl.add regexps str regexp;
          regexp 
       )
