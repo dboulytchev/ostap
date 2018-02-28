@@ -1,5 +1,5 @@
 (*
- * Samlpe: Ostap sample.
+ * Sample: Ostap sample.
  * Copyright (C) 2006-2009
  * Dmitri Boulytchev, St.Petersburg State University
  * 
@@ -71,7 +71,7 @@ let _ =
   parse (ostap ("a" -"b" "c")) (* but the skipped item nevertheless important for parsing *)
         (pair Token.repr Token.repr)        
         "adc";
-  parse (ostap (-"(" "a" -")")) (* it is quite usefule to omit a non-important symbols from *)
+  parse (ostap (-"(" "a" -")")) (* it is quite useful to omit a non-important symbols from *)
                                 (* being returned as a result                               *)
         Token.repr
         "(a)";
@@ -130,7 +130,7 @@ let _ =
 (* This completes the basic combinators overview *)
 
 (* Among the expression ostap (...) there is a structure item ostap (...) *)
-(* to specify a set of mutally-recirsive definitions:                     *)
+(* to specify a set of mutally-recursive definitions:                     *)
   
 ostap (
   animal  : "zeboro" | "cat" | "rabbit" | "giraffe";
