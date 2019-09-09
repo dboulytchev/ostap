@@ -54,7 +54,7 @@ let failWith x = Failed (Some x)
    end
 
  type ('a, 'stream, 'b, 'c) k       = ('a, 'stream, 'b, 'c) K.t
- type ('a, 'stream, 'b, 'c) parser  = 'stream -> ('a, 'stream, 'b, 'c) k -> ('stream, 'b, 'c) result
+ type ('a, 'stream, 'b, 'c) parserr  = 'stream -> ('a, 'stream, 'b, 'c) k -> ('stream, 'b, 'c) result
  type ('a, 'stream, 'b, 'c) parser' =            ('a, 'stream, 'b, 'c) k -> ('stream, 'b, 'c) result
 
 let bind p k f =

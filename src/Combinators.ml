@@ -1,3 +1,5 @@
+(*
+>newexpr in language.ml *)
 open Lazy
 open Matcher
 open Types
@@ -28,6 +30,16 @@ let join = function
 let comment str = function
 | None   -> None
 | Some m -> Some (m#comment str)
+
+let (<@>) : ('stream, 'b, 'c) result -> ('stream, 'b, 'c) result -> ('stream, 'b, 'c) result =
+  fun res1 res2 ->
+    match res1, res2 with
+    | Parsed ((res, x), opt1), Failed opt2             -> Parsed ((res, x), join opt1 opt2)
+    | Failed opt1,             Parsed ((res, x), opt2) -> Parsed ((res, x), join opt1 opt2)
+    | Parsed ((res, x), opt1), Parsed ((_, _), opt2)   -> failwith "Ambiguous grammar!!" (*Parsed ((res, x), join opt1 opt2)*)
+    | Failed opt1,             Failed opt2             -> Failed (join opt1 opt2)
+    | Empty, _ -> res2
+    | _, Empty -> res1
 
 let return =
   fun x s k -> k x s
@@ -121,22 +133,8 @@ let rec manyFold =
                       (p                 |> (fun xp  ->
                        manyFold f init p |> (fun xps ->
                        return (f xp xps)))) s k
-(*
-let rec many : ('a, 'stream, 'b, 'c) parser -> ('a list, 'stream, 'b, 'c) parser =
-  fun p s k ->
-    let result : ('stream, 'b, 'c) result ref = ref (k [] s) in
-    let rec loop alist stream =
-      p stream (memo_k (fun a stream' ->
-                  let alist' = List.rev (a :: (List.rev alist)) in
-                  let curResult = k (alist') stream' in
-                  result := curResult <@> !result;
-                  let tmp = loop (alist') stream' in
-                  curResult))
-    in
-    let tmp = loop [] s in
-    !result *)
 
-let rec many : ('a, 'stream, 'b, 'c) parser -> ('a list, 'stream, 'b, 'c) parser =
+let rec many : ('a, 'stream, 'b, 'c) parserr -> ('a list, 'stream, 'b, 'c) parserr =
   fun p -> memo (fun s k ->
     let rec loop alist stream result =
       result <@>
@@ -146,10 +144,7 @@ let rec many : ('a, 'stream, 'b, 'c) parser -> ('a list, 'stream, 'b, 'c) parser
                   loop (alist') stream' (curResult <@> result)))
   in
   loop [] s (k [] (Oo.copy s)))
-(*
-let many : ('a, 'stream, 'b, 'c) parser -> ('a list, 'stream, 'b, 'c) parser =
-  fun p s k -> manyFold (fun xp xps -> xp :: xps) [] p s k
- *)
+
 let (<*>) = many
 
 let someFold =
@@ -157,12 +152,7 @@ let someFold =
                   manyFold f init p |> (fun xps ->
                   return (f xp xps)))
 
-(* let some : ('a, 'stream, 'b, 'c) parser -> ('a list, 'stream, 'b, 'c) parser =
-  fun p -> p        |> (fun x  ->
-          (many p)  |> (fun xs ->
-          return (x :: xs)))
-*)
-let rec some : ('a, 'stream, 'b, 'c) parser -> ('a list, 'stream, 'b, 'c) parser =
+let rec some : ('a, 'stream, 'b, 'c) parserr -> ('a list, 'stream, 'b, 'c) parserr =
   fun p -> memo (fun s k ->
     let rec loop alist stream =
       p stream (memo_k (fun a stream' ->
@@ -180,7 +170,8 @@ let guard =
                             then k a s
                             else Failed (match r with
                                          | None -> None
-                                         | Some r -> Some (r a))))
+                                         | Some r -> Some (r a))
+    ))
 
 let unwrap r f g =
 match r with
