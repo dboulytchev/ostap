@@ -506,9 +506,17 @@ EXTEND
       let lazyRules = List.map2 (fun fixArgExpr paramNum ->
           let (paramPatts, paramExprs) = makePattsAndExprs "_param" paramNum in
           let (paramPatts', paramExprs') = makePattsAndExprs "_param'" paramNum in
-          let cmp = List.fold_right2 (fun paramExpr paramExpr' acc -> <:expr< $acc$ && ($paramExpr$ == $paramExpr'$)>>) paramExprs paramExprs' <:expr< True>> in
+          let cmp = List.fold_right2
+                      (fun paramExpr paramExpr' acc ->
+                         let tryExpr =
+                           let pwel = [(<:patt< $uid:"Invalid_argument"$ _>>), Ploc.VaVal None, <:expr< $paramExpr$ == $paramExpr'$>>] in
+                           <:expr< try $paramExpr$ = $paramExpr'$ with [ $list:pwel$ ]>>
+                         in
+                         <:expr< $acc$ && ($tryExpr$)>>
+                       )
+                       paramExprs paramExprs' <:expr< True>> in
           let innerMatch =
-            let e = <:expr<$lid:"acc"$>> in
+            let e = <:expr< $lid:"acc"$>> in
             let pwel = [(<:patt< Some _>>, Ploc.VaVal None,     <:expr< $lid:"acc"$>>    );
                       (<:patt< None>>,   Ploc.VaVal Some cmp, <:expr< Some $lid:"p'"$>>);
                       (<:patt< _>>,      Ploc.VaVal None,     <:expr< None>>           )] in
