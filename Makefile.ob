@@ -36,7 +36,7 @@ sample:
 	$(OB) sample/sample.native
 
 ######################## Tests related stuff  ##########################
-REGRES_CASES := $(shell seq -s \  -w 10 010)
+REGRES_CASES := $(shell seq -s \  -w 1 015)
 
 define TESTRULES
 BYTE_TEST_EXECUTABLES += camlp5/regression/test$(1).byte

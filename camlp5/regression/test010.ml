@@ -71,27 +71,6 @@ class lexer (s : string) =
         else emptyResult
   end
 
-  ostap (
-        expr   : x:(expr -"+")* y:mulli {match x with [] -> y | x::_ -> `Add (x, y)};
-        mulli  : x:mulli "*" y:primary  {`Mul (x, y)} | primary;
-        primary: d:IDENT {`Const d} | n:IDENT {`Var n} | -"(" expr -")"
-      )
-
-
-  let tests = [
-      "a*b + c";
-      "a + b*c";
-      "a*b + c*d"
-    ]
-
-  let _ =
-    List.iter
-      (fun x ->
-        match expr (new lexer x) (fun res s -> Parsed ((res, s), None)) with
-          | Parsed _ -> Printf.printf "\t\t\t-> ok\n"
-          | _ -> Printf.printf "Failed.\n"
-      ) tests
-(*
 module X =
   struct
 
@@ -114,4 +93,4 @@ let _ =
   | Parsed ((str, _), _) ->
       Printf.printf "Parsed: %s\n" (List.fold_left (^) "" str)
   | _ -> Printf.printf "Failed.\n"
-  end; *)
+  end;

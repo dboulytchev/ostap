@@ -42,10 +42,6 @@ ostap (
 )
 
 ostap (
-  listBy1[delim][item]: h:item t:(-delim item)+ {h::t}
-)
-
-ostap (
   listWith[item][f][x]: listByWith[ostap (",")][item][f][x]
 )
 
@@ -101,124 +97,6 @@ let expr f ops opnd =
   )
   in
   ostap (inner[0][id])
-
-(* Infix helpers *)
-module Infix =
-  struct
-     type ('expr, 'atr) ops  = [`Lefta | `Righta | `Nona] * (string * (('expr -> 'atr -> 'expr -> 'expr) * ('atr -> ('atr * 'atr)))) list
-
-     let compare_ops ((_, xs) : ('e, 'a) ops) ((_, ys) : ('e, 'a) ops) =
-       Pervasives.compare (List.map fst xs) (List.map fst ys)
-
-     module StringMap  = Map.Make (String)
-     module PointerMap =
-        struct
-
-         include Map.Make (
-           struct
-             type t = Obj.t
-
-             let compare x y = compare_ops (Obj.magic x) (Obj.magic y)
-           end
-         )
-
-         let find (x : ('e, 'a) ops) (m : 'v t) = find (Obj.repr x) m
-         let add (x : ('e, 'a) ops) (v : 'v) (m : 'v t) = add (Obj.repr x) v m
-       end
-
-    type ('e, 'a) t = ('e, 'a) ops * (((('e, 'a) ops) option) PointerMap.t) * (((('e, 'a) ops) option) PointerMap.t) * ((('e, 'a) ops) StringMap.t)
-
-    let singleton a s sem =
-      let newp = Obj.magic (a, [s, sem]) in
-      newp,
-      (PointerMap.add newp None PointerMap.empty),
-      (PointerMap.add newp None PointerMap.empty),
-      (StringMap.add s newp StringMap.empty)
-
-    let name infix =
-      let b = Buffer.create 64 in
-      Buffer.add_string b "__Infix_";
-      Seq.iter (fun c -> Buffer.add_string b (string_of_int @@ Char.code c)) @@ String.to_seq infix;
-      Buffer.contents b
-
-    let next (_, _, nexts, _) l = match l with Some l -> PointerMap.find (Obj.magic l) nexts
-
-    let start (start, _, _, _) = Obj.magic start
-
-    let find_op (start, prevs, nexts, nodes) op cb ce =
-      match StringMap.find_opt op nodes with
-      | None -> ce ()
-      | Some p -> cb p (start, prevs, nexts, nodes)
-
-    let no_op op coord = `Fail (Printf.sprintf "infix ``%s'' not found in the scope at %s" op (Msg.Coord.toString coord))
-
-    let toOstap s = ostap (- $(s))
-
-    let at coord op newop sem infix =
-      find_op infix op
-        (fun p (start, prevs, nexts, nodes) ->
-           let (a, l) = Obj.magic p in
-           let newp = Obj.magic (a, (newop, sem) :: l) in
-           let newStart = match PointerMap.find p prevs with None -> newp | Some x -> start in
-           let newPrevs = PointerMap.add newp (PointerMap.find p prevs) (match PointerMap.find p nexts with None -> prevs | Some next -> PointerMap.add next (Some newp) prevs) in
-           let newNexts = PointerMap.add newp (PointerMap.find p nexts) (match PointerMap.find p prevs with None -> nexts | Some prev -> PointerMap.add prev (Some newp) nexts) in
-           let newNodes = List.fold_right (fun (s, _) map -> StringMap.add s newp map) l nodes in
-           `Ok (newStart, newPrevs, newNexts, newNodes)
-        )
-        (fun _ -> no_op op coord)
-
-    let before coord op newop assoc sem infix =
-      find_op infix op
-        (fun p (start, prevs, nexts, nodes) ->
-           let newp = Obj.magic (assoc, [newop, sem]) in
-           let newStart = match PointerMap.find p prevs with None -> newp | Some x -> start in
-           let newPrevs = PointerMap.add newp (PointerMap.find p prevs) (PointerMap.add p (Some newp) prevs) in
-           let newNexts = PointerMap.add newp (Some p) (match PointerMap.find p prevs with None -> nexts | Some prev -> PointerMap.add prev (Some newp) nexts) in
-           let newNodes = StringMap.add newop newp nodes in
-           `Ok (newStart, newPrevs, newNexts, newNodes)
-        )
-        (fun _ -> no_op op coord)
-
-    let after coord op newop assoc sem infix =
-      find_op infix op
-        (fun p (start, prevs, nexts, nodes) ->
-           let newp = Obj.magic (assoc, [newop, sem]) in
-           let newStart = start in
-           let newPrevs = PointerMap.add newp (Some p) (match PointerMap.find p nexts with None -> prevs | Some next -> PointerMap.add next (Some newp) prevs) in
-           let newNexts = PointerMap.add newp (PointerMap.find p nexts) (PointerMap.add p (Some newp) nexts) in
-           let newNodes = StringMap.add newop newp nodes in
-           `Ok (newStart, newPrevs, newNexts, newNodes)
-        )
-        (fun _ -> no_op op coord)
-end
-
-let newexpr f infix opnd atr =
-  let left  f c x a y = f (c x) a y in
-  let right f c x a y = c (f x a y) in
-  let isLast l = match l with None -> true | _ -> false in
-  let next l = Infix.next infix l in
-  let start = Infix.start infix in
-  let atrr l atr = match l with Some (_, list)  -> snd (snd (snd (List.hd list)) atr) in
-  let atrl l atr = match l with Some (_, list)  -> fst (snd (snd (List.hd list)) atr) in
-  let nona l = match l with Some (assoc, _) -> (assoc = `Nona) in
-  let op   l = match l with Some (assoc, list) ->
-                            let list = List.map (fun (s, f) -> Infix.toOstap s, f) list in
-                            let g = match assoc with `Lefta | `Nona -> left | `Righta -> right in
-                            altl (List.map (fun (oper, (sema, _)) -> ostap (!(oper) {g sema})) list)
-  in
-  let id   x = x in
-  let ostap (
-          inner[l][c][atr]: f[ostap (
-          {     isLast l                 } => x:opnd[atr] {c x}
-        | {not (isLast l) && not (nona l)} => (x:inner[next l][id][atrl l atr] -o:op[l] b:inner[l][o c x atr][atrr l atr] {b}
-                                             | x:inner[next l][id][atr] {c x})
-        | {not (isLast l) &&       nona l} => (x:inner[next l][id][atrl l atr] b:(op[l] inner[next l][id][atrr l atr]) {c (let (o, y) = b in o id x atr y)}
-                                             | x:inner[next l][id][atr] {c x})
-            )]
-        )
-  in
-  ostap (inner[Some start][id][atr])
-
 
 let read name =
   let inch = open_in_bin name in
@@ -312,5 +190,5 @@ module Lexers =
            let [loc, m :: _] = err#retrieve (`First 1) (`Desc) in
            let m =  match m with `Msg m -> m | `Comment (s, _) -> Msg.make s [||] loc in
            `Fail (Msg.toString m)
-         | _ -> `Fail "Oh, no error explanation"
+         | None -> `Fail "Oh, fuck"
       )
