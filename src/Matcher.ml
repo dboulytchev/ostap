@@ -170,7 +170,11 @@ class t (s : String.t) =
     val skipper = defaultSkipper
     val context : aux = `Init
 
-    method coord = coord
+    method coord =
+      match self#skip p coord with
+      | `Skipped (p, coord) -> coord
+      | `Failed msg -> coord
+
     method line  = fst coord
     method col   = snd coord
     method skip  = skipper
@@ -251,6 +255,9 @@ class t (s : String.t) =
              else self#failed "<EOF> expected" coord
           )
 
-    method loc = Msg.Locator.Point coord
+    method loc =
+      match self#skip p coord with
+      | `Skipped (p, coord) -> Msg.Locator.Point coord
+      | `Failed msg -> Msg.Locator.Point coord
 
   end
